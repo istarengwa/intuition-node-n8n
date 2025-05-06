@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-base.intuitionfetch",
+	"nodeVersion": "1.0.0",
+	"codexVersion": "1.0.0",
+	"categories": ["Development", "Developer Tools"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/istarengwa/intuition"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://tech.docs.intuition.systems/dev/overview"
+			}
+		]
+	}
+}
