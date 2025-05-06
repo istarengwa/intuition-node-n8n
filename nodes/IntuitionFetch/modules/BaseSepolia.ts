@@ -5,6 +5,7 @@ import {
     fetchTriplesForPredicate,
     fetchTriplesForObject,
     fetchTripleById,
+    fetchAtoms,
     fetchAtomDetails,
     searchTriples,
   } from './Base';
@@ -21,6 +22,7 @@ import {
     fetchTriplesForPredicate,
     fetchTriplesForObject,
     fetchTripleById,
+    fetchAtoms,
     fetchAtomDetails,
     searchTriples,
   };

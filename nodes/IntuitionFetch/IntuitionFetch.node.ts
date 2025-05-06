@@ -44,6 +44,7 @@ export class IntuitionFetch implements INodeType {
           { name: 'Fetch Triples For Predicate', value: 'fetchTriplesForPredicate' },
           { name: 'Fetch Triples For Object', value: 'fetchTriplesForObject' },
           { name: 'Fetch Triple By ID', value: 'fetchTripleById' },
+          { name: 'Fetch Atoms', value: 'fetchAtoms' },
           { name: 'Fetch Atom Details', value: 'fetchAtomDetails' },
           { name: 'Search Triples', value: 'searchTriples' },
         ],
@@ -166,6 +167,9 @@ export class IntuitionFetch implements INodeType {
         case 'fetchTripleById':
           result = await module.fetchTripleById(client, this.getNodeParameter('tripleId', i) as string);
           break;
+          case 'fetchAtoms':
+            result = await module.fetchAtoms(client);
+            break;          
         case 'fetchAtomDetails':
           result = await module.fetchAtomDetails(client, this.getNodeParameter('atomId', i) as string);
           break;
