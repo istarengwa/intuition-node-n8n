@@ -1,29 +1,11 @@
-import {
-    IntuitionEndpoint,
-    fetchTriples,
-    fetchTriplesForSubject,
-    fetchTriplesForPredicate,
-    fetchTriplesForObject,
-    fetchTripleById,
-    fetchAtoms,
-    fetchAtomDetails,
-    searchTriples,
-  } from './Base';
+import { IntuitionEndpoint } from './Base';
   
-  export const ENDPOINTS: Record<'baseSepolia', IntuitionEndpoint> = {
-    baseSepolia: {
-      url: 'https://api.i7n.dev/v1/graphql',
-    },
-  };
-  
-  export {
-    fetchTriples,
-    fetchTriplesForSubject,
-    fetchTriplesForPredicate,
-    fetchTriplesForObject,
-    fetchTripleById,
-    fetchAtoms,
-    fetchAtomDetails,
-    searchTriples,
-  };
+export const ENDPOINTS: Record<'baseSepolia', IntuitionEndpoint> = {
+  baseSepolia: {
+    url: 'https://api.i7n.dev/v1/graphql',
+  },
+};
+
+export * from './Triples';
+export * from './Atoms';
   
