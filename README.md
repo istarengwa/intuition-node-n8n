@@ -1,46 +1,100 @@
 ![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
 
-# n8n-nodes-starter
+# n8n-nodes-intuition
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](n8n.io). It includes the node linter and other dependencies.
+This repository contains custom nodes for [n8n](https://n8n.io) that integrate with the [Intuition Protocol](https://intuition.systems). These nodes allow you to query the Intuition GraphQL API directly within your automation workflows.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+---
 
-## Prerequisites
+## 🚀 Installation
 
-You need the following installed on your development machine:
+### 1. Clone the repository
 
-* [git](https://git-scm.com/downloads)
-* Node.js and pnpm. Minimum version Node 18. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  pnpm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+```bash
+git clone git@github.com:istarengwa/intuition.git
+cd intuition
+```
 
-## Using this starter
+### 2. Install dependencies
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+```bash
+pnpm install
+```
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `pnpm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `pnpm lint` to check for errors or `pnpm lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+> Make sure you are using Node.js 18+ and `pnpm` version 9 or higher.
 
-## More information
+### 3. Run in development mode
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+```bash
+N8N_ENABLE_CUSTOM_EXTENSIONS=true \
+N8N_CUSTOM_EXTENSIONS=./dist \
+pnpm dev
+```
 
-## License
+> Ensure that port `5678` is free or set a different port using the `PORT` environment variable.
+
+---
+
+## 🧱 Available Nodes
+
+### ✅ `Intuition Fetch`
+
+This node allows you to interact with the Intuition GraphQL API using different endpoints (`railsMockApi`, `base`, `baseSepolia`) and execute various operations:
+
+| Operation                  | Description                                                                       |
+| -------------------------- | --------------------------------------------------------------------------------- |
+| `fetchTriples`             | Fetch all available triples                                                       |
+| `fetchTriplesForSubject`   | Fetch triples where a specific `subject.id` is involved                           |
+| `fetchTriplesForPredicate` | Fetch triples with a given predicate ID                                           |
+| `fetchTriplesForObject`    | Fetch triples linked to a specific object                                         |
+| `fetchTripleById`          | Fetch a single triple using its unique ID                                         |
+| `fetchAtoms`               | Retrieve a full list of atoms and their metadata (label, value, vault info, etc.) |
+| `fetchAtomDetails`         | Fetch detailed data about a specific atom                                         |
+| `searchTriples`            | Perform advanced filtering to search for specific triples                         |
+
+---
+
+## 📁 Project Structure
+
+```
+/nodes
+  /IntuitionFetch
+    IntuitionFetch.node.ts       ← Main node logic
+
+/modules
+  Base.ts                        ← Endpoint definition (Mainnet + Mock)
+  BaseSepolia.ts                 ← Testnet endpoint + exports
+  Atoms.ts                       ← Atom-related fetch functions
+  Triples.ts                     ← Triple-related fetch functions
+```
+
+---
+
+## 🔐 Authentication
+
+No authentication is required at the moment for the public Intuition GraphQL endpoints (`base` and `baseSepolia`).
+
+---
+
+## ⚙️ Dependencies
+
+* [Node.js](https://nodejs.org) 18+
+* [pnpm](https://pnpm.io) (v9+ recommended)
+* [n8n](https://n8n.io) installed globally:
+
+```bash
+pnpm add -g n8n
+```
+
+---
+
+## 📖 Related Documentation
+
+* [Intuition Protocol Developer Docs](https://tech.docs.intuition.systems/dev/)
+* [n8n - Building Custom Nodes](https://docs.n8n.io/integrations/creating-nodes/)
+
+---
+
+## 📄 License
 
 [MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
