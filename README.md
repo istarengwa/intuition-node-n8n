@@ -11,8 +11,8 @@ This repository contains custom nodes for [n8n](https://n8n.io) that integrate w
 ### 1. Clone the repository
 
 ```bash
-git clone git@github.com:istarengwa/intuition.git
-cd intuition
+git clone git@github.com:istarengwa/intuition-node-n8n.git
+cd intuition-node-n8n
 ```
 
 ### 2. Install dependencies
