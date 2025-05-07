@@ -50,7 +50,6 @@ This node allows you to interact with the Intuition GraphQL API using different 
 | `fetchTripleById`          | Fetch a single triple using its unique ID                                         |
 | `fetchAtoms`               | Retrieve a full list of atoms and their metadata (label, value, vault info, etc.) |
 | `fetchAtomDetails`         | Fetch detailed data about a specific atom                                         |
-| `searchTriples`            | Perform advanced filtering to search for specific triples                         |
 
 ---
 
