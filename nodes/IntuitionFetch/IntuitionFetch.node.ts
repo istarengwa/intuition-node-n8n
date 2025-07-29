@@ -46,11 +46,12 @@ export class IntuitionFetch implements INodeType {
 					{ name: 'Fetch Triples For Object', value: 'fetchTriplesForObject' },
 					{ name: 'Fetch Triple By ID', value: 'fetchTripleById' },
 					{ name: 'Fetch Atoms', value: 'fetchAtoms' },
-					{ name: 'Fetch Atom Details', value: 'fetchAtomDetails' },
-				],
-				default: 'fetchTriples',
-				description: 'Select the operation to perform',
-			},
+                                        { name: 'Fetch Atom Details', value: 'fetchAtomDetails' },
+                                        { name: 'Search Triples', value: 'searchTriples' },
+                                ],
+                                default: 'fetchTriples',
+                                description: 'Select the operation to perform',
+                        },
 			{
 				displayName: 'Subject ID',
 				name: 'subjectId',
@@ -95,22 +96,44 @@ export class IntuitionFetch implements INodeType {
 					},
 				},
 			},
-			{
-				displayName: 'Atom ID',
-				name: 'atomId',
-				type: 'string',
-				default: '',
-				displayOptions: {
-					show: {
-						operation: ['fetchAtomDetails'],
-					},
-				},
-			},
-			{
-				displayName: 'Filters',
-				name: 'filters',
-				type: 'json',
-				default: '',
+                        {
+                                displayName: 'Atom ID',
+                                name: 'atomId',
+                                type: 'string',
+                                default: '',
+                                displayOptions: {
+                                        show: {
+                                                operation: ['fetchAtomDetails'],
+                                        },
+                                },
+                        },
+                        {
+                                displayName: 'Limit',
+                                name: 'limit',
+                                type: 'number',
+                                default: 10,
+                                displayOptions: {
+                                        show: {
+                                                operation: ['fetchAtoms'],
+                                        },
+                                },
+                        },
+                        {
+                                displayName: 'Offset',
+                                name: 'offset',
+                                type: 'number',
+                                default: 0,
+                                displayOptions: {
+                                        show: {
+                                                operation: ['fetchAtoms'],
+                                        },
+                                },
+                        },
+                        {
+                                displayName: 'Filters',
+                                name: 'filters',
+                                type: 'json',
+                                default: '',
 				displayOptions: {
 					show: {
 						operation: ['searchTriples'],
@@ -153,15 +176,26 @@ export class IntuitionFetch implements INodeType {
 				case 'fetchTripleById':
 					result = await module.fetchTripleById(client, this.getNodeParameter('tripleId', i) as string);
 					break;
-				case 'fetchAtoms':
-					result = await module.fetchAtoms(client);
-					break;
-				case 'fetchAtomDetails':
-					result = await module.fetchAtomDetails(client, this.getNodeParameter('atomId', i) as string);
-					break;
-				default:
-					throw new Error(`Unsupported operation: ${operation}`);
-			}
+                                case 'fetchAtoms':
+                                        result = await module.fetchAtoms(
+                                                client,
+                                                this.getNodeParameter('limit', i) as number,
+                                                this.getNodeParameter('offset', i) as number,
+                                        );
+                                        break;
+                                case 'fetchAtomDetails':
+                                        result = await module.fetchAtomDetails(client, this.getNodeParameter('atomId', i) as string);
+                                        break;
+                                case 'searchTriples':
+                                        {
+                                                const rawFilters = this.getNodeParameter('filters', i) as string | IDataObject;
+                                                const filters = typeof rawFilters === 'string' && rawFilters !== '' ? JSON.parse(rawFilters) : rawFilters;
+                                                result = await module.searchTriples(client, filters);
+                                        }
+                                        break;
+                                default:
+                                        throw new Error(`Unsupported operation: ${operation}`);
+                        }
 
 			returnData.push({ json: result as IDataObject });
 		}

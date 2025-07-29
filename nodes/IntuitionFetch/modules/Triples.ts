@@ -126,3 +126,27 @@ export async function fetchTripleById(client: GraphQLClient, tripleId: string) {
     triples: allTriples.triples.filter((t: any) => t.id === tripleId),
   };
 }
+
+export async function searchTriples(client: GraphQLClient, filters: unknown) {
+  const query = `
+    query SearchTriples($where: triples_bool_exp) {
+      triples(where: $where) {
+        id
+        subject {
+          id
+          label
+        }
+        predicate {
+          id
+          label
+        }
+        object {
+          id
+          label
+        }
+      }
+    }
+  `;
+  const variables = { where: filters ?? {} };
+  return client.request(query, variables);
+}

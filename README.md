@@ -48,8 +48,9 @@ This node allows you to interact with the Intuition GraphQL API using different 
 | `fetchTriplesForPredicate` | Fetch triples with a given predicate ID                                           |
 | `fetchTriplesForObject`    | Fetch triples linked to a specific object                                         |
 | `fetchTripleById`          | Fetch a single triple using its unique ID                                         |
-| `fetchAtoms`               | Retrieve a full list of atoms and their metadata (label, value, vault info, etc.) |
+| `fetchAtoms`               | Retrieve a full list of atoms and their metadata (label, value, vault info, etc.) with optional limit/offset |
 | `fetchAtomDetails`         | Fetch detailed data about a specific atom                                         |
+| `searchTriples`            | Search triples server-side using Hasura-style filters                      |
 
 ---
 
