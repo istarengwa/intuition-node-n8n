@@ -77,6 +77,32 @@ export interface TripleSearchFilters {
   atomLabel?: string;  // match any of subject/predicate/object label
   createdAtFrom?: string;
   createdAtTo?: string;
+  transactionHash?: string;
+  creatorId?: string;
+  blockNumberMin?: number;
+  blockNumberMax?: number;
+  // per-position filters
+  subjectTermId?: string;
+  predicateTermId?: string;
+  objectTermId?: string;
+  subjectLabel?: string;
+  predicateLabel?: string;
+  objectLabel?: string;
+  subjectType?: string;
+  predicateType?: string;
+  objectType?: string;
+  subjectEmoji?: string;
+  predicateEmoji?: string;
+  objectEmoji?: string;
+  subjectCreatorId?: string;
+  predicateCreatorId?: string;
+  objectCreatorId?: string;
+  subjectDataContains?: string;
+  predicateDataContains?: string;
+  objectDataContains?: string;
+  subjectImageContains?: string;
+  predicateImageContains?: string;
+  objectImageContains?: string;
 }
 
 export async function searchTriples(
@@ -121,6 +147,48 @@ export async function searchTriples(
   if (filters.createdAtTo) {
     andConditions.push({ created_at: { _lte: filters.createdAtTo } });
   }
+
+  if (filters.transactionHash) {
+    andConditions.push({ transaction_hash: { _eq: filters.transactionHash } });
+  }
+  if (filters.creatorId) {
+    andConditions.push({ creator_id: { _eq: filters.creatorId } });
+  }
+  if (typeof filters.blockNumberMin === 'number') {
+    andConditions.push({ block_number: { _gte: filters.blockNumberMin } });
+  }
+  if (typeof filters.blockNumberMax === 'number') {
+    andConditions.push({ block_number: { _lte: filters.blockNumberMax } });
+  }
+
+  // Position-specific filters
+  if (filters.subjectTermId) andConditions.push({ subject_id: { _eq: filters.subjectTermId } });
+  if (filters.predicateTermId) andConditions.push({ predicate_id: { _eq: filters.predicateTermId } });
+  if (filters.objectTermId) andConditions.push({ object_id: { _eq: filters.objectTermId } });
+
+  if (filters.subjectLabel) andConditions.push({ subject: { label: { _ilike: `%${filters.subjectLabel}%` } } });
+  if (filters.predicateLabel) andConditions.push({ predicate: { label: { _ilike: `%${filters.predicateLabel}%` } } });
+  if (filters.objectLabel) andConditions.push({ object: { label: { _ilike: `%${filters.objectLabel}%` } } });
+
+  if (filters.subjectType) andConditions.push({ subject: { type: { _eq: filters.subjectType } } });
+  if (filters.predicateType) andConditions.push({ predicate: { type: { _eq: filters.predicateType } } });
+  if (filters.objectType) andConditions.push({ object: { type: { _eq: filters.objectType } } });
+
+  if (filters.subjectEmoji) andConditions.push({ subject: { emoji: { _eq: filters.subjectEmoji } } });
+  if (filters.predicateEmoji) andConditions.push({ predicate: { emoji: { _eq: filters.predicateEmoji } } });
+  if (filters.objectEmoji) andConditions.push({ object: { emoji: { _eq: filters.objectEmoji } } });
+
+  if (filters.subjectCreatorId) andConditions.push({ subject: { creator: { id: { _eq: filters.subjectCreatorId } } } });
+  if (filters.predicateCreatorId) andConditions.push({ predicate: { creator: { id: { _eq: filters.predicateCreatorId } } } });
+  if (filters.objectCreatorId) andConditions.push({ object: { creator: { id: { _eq: filters.objectCreatorId } } } });
+
+  if (filters.subjectDataContains) andConditions.push({ subject: { data: { _ilike: `%${filters.subjectDataContains}%` } } });
+  if (filters.predicateDataContains) andConditions.push({ predicate: { data: { _ilike: `%${filters.predicateDataContains}%` } } });
+  if (filters.objectDataContains) andConditions.push({ object: { data: { _ilike: `%${filters.objectDataContains}%` } } });
+
+  if (filters.subjectImageContains) andConditions.push({ subject: { image: { _ilike: `%${filters.subjectImageContains}%` } } });
+  if (filters.predicateImageContains) andConditions.push({ predicate: { image: { _ilike: `%${filters.predicateImageContains}%` } } });
+  if (filters.objectImageContains) andConditions.push({ object: { image: { _ilike: `%${filters.objectImageContains}%` } } });
 
   const where = andConditions.length ? { _and: andConditions } : {};
 

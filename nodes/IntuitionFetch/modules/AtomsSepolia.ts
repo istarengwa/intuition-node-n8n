@@ -11,6 +11,7 @@ const atomsLightSelection = `
   created_at
   transaction_hash
   wallet_id
+  creator_id
   positions_aggregate { aggregate { count } }
   as_subject_triples_aggregate { aggregate { count } }
   as_predicate_triples_aggregate { aggregate { count } }
@@ -28,6 +29,7 @@ const atomsFullSelection = `
   created_at
   transaction_hash
   wallet_id
+  creator_id
   creator { id label image atom_id type }
   term { total_market_cap updated_at }
   positions_aggregate { aggregate { count sum { shares } } }
@@ -77,10 +79,19 @@ export interface AtomSearchFilters {
   transactionHash?: string;
   emoji?: string;
   imageContains?: string;
+  dataContains?: string;
   blockNumberMin?: number;
   blockNumberMax?: number;
   createdAtFrom?: string; // ISO timestamp
   createdAtTo?: string;   // ISO timestamp
+  creatorId?: string;
+  creatorLabel?: string;
+  creatorType?: string;
+  creatorAtomId?: string;
+  termTotalMarketCapMin?: string | number;
+  termTotalMarketCapMax?: string | number;
+  termUpdatedAtFrom?: string;
+  termUpdatedAtTo?: string;
 }
 
 export async function searchAtoms(
@@ -102,10 +113,19 @@ export async function searchAtoms(
   if (filters.label) andConditions.push({ label: { _ilike: `%${filters.label}%` } });
   if (filters.emoji) andConditions.push({ emoji: { _eq: filters.emoji } });
   if (filters.imageContains) andConditions.push({ image: { _ilike: `%${filters.imageContains}%` } });
+  if (filters.dataContains) andConditions.push({ data: { _ilike: `%${filters.dataContains}%` } });
   if (typeof filters.blockNumberMin === 'number') andConditions.push({ block_number: { _gte: filters.blockNumberMin } });
   if (typeof filters.blockNumberMax === 'number') andConditions.push({ block_number: { _lte: filters.blockNumberMax } });
   if (filters.createdAtFrom) andConditions.push({ created_at: { _gte: filters.createdAtFrom } });
   if (filters.createdAtTo) andConditions.push({ created_at: { _lte: filters.createdAtTo } });
+  if (filters.creatorId) andConditions.push({ creator_id: { _eq: filters.creatorId } });
+  if (filters.creatorLabel) andConditions.push({ creator: { label: { _ilike: `%${filters.creatorLabel}%` } } });
+  if (filters.creatorType) andConditions.push({ creator: { type: { _eq: filters.creatorType } } });
+  if (filters.creatorAtomId) andConditions.push({ creator: { atom_id: { _eq: filters.creatorAtomId } } });
+  if (typeof filters.termTotalMarketCapMin !== 'undefined') andConditions.push({ term: { total_market_cap: { _gte: filters.termTotalMarketCapMin } } });
+  if (typeof filters.termTotalMarketCapMax !== 'undefined') andConditions.push({ term: { total_market_cap: { _lte: filters.termTotalMarketCapMax } } });
+  if (filters.termUpdatedAtFrom) andConditions.push({ term: { updated_at: { _gte: filters.termUpdatedAtFrom } } });
+  if (filters.termUpdatedAtTo) andConditions.push({ term: { updated_at: { _lte: filters.termUpdatedAtTo } } });
 
   if (andConditions.length) where._and = andConditions;
 

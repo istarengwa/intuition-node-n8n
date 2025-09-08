@@ -125,7 +125,7 @@ export class IntuitionTrigger implements INodeType {
     const light = (this.getNodeParameter('lightOutput', false) as boolean) ?? false;
 
     if (resource === 'atoms') {
-      const filters = (this.getNodeParameter('atomFilters', {}) as IDataObject) || {};
+      const filters = (this.getNodeParameter(light ? 'atomFiltersLight' : 'atomFiltersFull', {}) as IDataObject) || {};
       const startFromNow = (this.getNodeParameter('startFromNow', true) as boolean) ?? true;
       const lastCursor = (data.lastAtomCreatedAt as string) || '';
 
@@ -168,7 +168,7 @@ export class IntuitionTrigger implements INodeType {
         if (latest) data.lastAtomCreatedAt = latest;
       }
     } else if (resource === 'triples') {
-      const filters = (this.getNodeParameter('tripleFilters', {}) as IDataObject) || {};
+      const filters = (this.getNodeParameter(light ? 'tripleFiltersLight' : 'tripleFiltersFull', {}) as IDataObject) || {};
       const startFromNow = (this.getNodeParameter('startFromNow', true) as boolean) ?? true;
       const maxSeen = (this.getNodeParameter('maxSeen', 10000) as number) ?? 10000;
 

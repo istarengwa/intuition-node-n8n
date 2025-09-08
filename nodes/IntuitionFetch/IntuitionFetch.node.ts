@@ -55,84 +55,56 @@ import * as BaseSepolia from './modules/BaseSepolia';
 				},
 
 				{
-					displayName: 'Atom Filters',
-					name: 'atomFilters',
+					displayName: 'Atom Filters (Light)',
+					name: 'atomFiltersLight',
 					type: 'collection',
 					placeholder: 'Add a filter',
 					default: {},
-					displayOptions: {
-						show: { operation: ['searchAtoms'] },
-					},
+					displayOptions: { show: { operation: ['searchAtoms'], lightOutput: [true] } },
 					options: [
-						{
-							displayName: 'Term ID',
-							name: 'termId',
-							type: 'string',
-							default: '',
-							description: 'Exact term_id of the atom',
-						},
-						{
-							displayName: 'Label (contains)',
-							name: 'label',
-							type: 'string',
-							default: '',
-							description: 'Case-insensitive substring match',
-						},
-						{
-							displayName: 'Type',
-							name: 'type',
-							type: 'string',
-							default: '',
-						},
-						{
-							displayName: 'Wallet ID',
-							name: 'walletId',
-							type: 'string',
-							default: '',
-						},
-						{
-							displayName: 'Transaction Hash',
-							name: 'transactionHash',
-							type: 'string',
-							default: '',
-						},
-						{
-							displayName: 'Emoji',
-							name: 'emoji',
-							type: 'string',
-							default: '',
-						},
-						{
-							displayName: 'Image (contains)',
-							name: 'imageContains',
-							type: 'string',
-							default: '',
-							description: 'Case-insensitive substring match in image URL/hash',
-						},
-						{
-							displayName: 'Block Number Min',
-							name: 'blockNumberMin',
-							type: 'number',
-							default: 0,
-						},
-						{
-							displayName: 'Block Number Max',
-							name: 'blockNumberMax',
-							type: 'number',
-							default: 0,
-						},
-						{
-							displayName: 'Created At From',
-							name: 'createdAtFrom',
-							type: 'dateTime',
-							default: '',
-						},
-						{
-							displayName: 'Created At To',
-							name: 'createdAtTo',
-							type: 'dateTime',
-							default: '',
-						},
+						{ displayName: 'Term ID', name: 'termId', type: 'string', default: '' },
+						{ displayName: 'Label (contains)', name: 'label', type: 'string', default: '' },
+						{ displayName: 'Type', name: 'type', type: 'string', default: '' },
+						{ displayName: 'Wallet ID', name: 'walletId', type: 'string', default: '' },
+						{ displayName: 'Transaction Hash', name: 'transactionHash', type: 'string', default: '' },
+						{ displayName: 'Creator ID', name: 'creatorId', type: 'string', default: '' },
+						{ displayName: 'Emoji', name: 'emoji', type: 'string', default: '' },
+						{ displayName: 'Image (contains)', name: 'imageContains', type: 'string', default: '' },
+						{ displayName: 'Data (contains)', name: 'dataContains', type: 'string', default: '' },
+						{ displayName: 'Block Number Min', name: 'blockNumberMin', type: 'number', default: 0 },
+						{ displayName: 'Block Number Max', name: 'blockNumberMax', type: 'number', default: 0 },
+						{ displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+						{ displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
+					],
+				},
+				{
+					displayName: 'Atom Filters (Full)',
+					name: 'atomFiltersFull',
+					type: 'collection',
+					placeholder: 'Add a filter',
+					default: {},
+					displayOptions: { show: { operation: ['searchAtoms'], lightOutput: [false] } },
+					options: [
+						{ displayName: 'Term ID', name: 'termId', type: 'string', default: '' },
+						{ displayName: 'Label (contains)', name: 'label', type: 'string', default: '' },
+						{ displayName: 'Type', name: 'type', type: 'string', default: '' },
+						{ displayName: 'Wallet ID', name: 'walletId', type: 'string', default: '' },
+						{ displayName: 'Transaction Hash', name: 'transactionHash', type: 'string', default: '' },
+						{ displayName: 'Creator ID', name: 'creatorId', type: 'string', default: '' },
+						{ displayName: 'Creator Label (contains)', name: 'creatorLabel', type: 'string', default: '' },
+						{ displayName: 'Creator Type', name: 'creatorType', type: 'string', default: '' },
+						{ displayName: 'Creator Atom ID', name: 'creatorAtomId', type: 'string', default: '' },
+						{ displayName: 'Emoji', name: 'emoji', type: 'string', default: '' },
+						{ displayName: 'Image (contains)', name: 'imageContains', type: 'string', default: '' },
+						{ displayName: 'Data (contains)', name: 'dataContains', type: 'string', default: '' },
+						{ displayName: 'Block Number Min', name: 'blockNumberMin', type: 'number', default: 0 },
+						{ displayName: 'Block Number Max', name: 'blockNumberMax', type: 'number', default: 0 },
+						{ displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+						{ displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
+						{ displayName: 'Term Total Market Cap Min', name: 'termTotalMarketCapMin', type: 'string', default: '' },
+						{ displayName: 'Term Total Market Cap Max', name: 'termTotalMarketCapMax', type: 'string', default: '' },
+						{ displayName: 'Term Updated At From', name: 'termUpdatedAtFrom', type: 'dateTime', default: '' },
+						{ displayName: 'Term Updated At To', name: 'termUpdatedAtTo', type: 'dateTime', default: '' },
 					],
 				},
 				{
@@ -195,36 +167,64 @@ import * as BaseSepolia from './modules/BaseSepolia';
 					description: 'Apply sorting to atom search results',
 				},
 				{
-					displayName: 'Triple Filters',
-					name: 'tripleFilters',
+					displayName: 'Triple Filters (Light)',
+					name: 'tripleFiltersLight',
 					type: 'collection',
 					placeholder: 'Add a filter',
 					default: {},
-					displayOptions: {
-						show: { operation: ['searchTriples'] },
-					},
+					displayOptions: { show: { operation: ['searchTriples'], lightOutput: [true] } },
 					options: [
-						{
-							displayName: 'Triple Term ID',
-							name: 'tripleId',
-							type: 'string',
-							default: '',
-							description: 'Exact term_id of the triple',
-						},
-						{
-							displayName: 'Atom Term ID',
-							name: 'atomTermId',
-							type: 'string',
-							default: '',
-							description: 'Match subject_id, predicate_id or object_id',
-						},
-						{
-							displayName: 'Atom Label (contains)',
-							name: 'atomLabel',
-							type: 'string',
-							default: '',
-							description: 'Case-insensitive substring match across subject/predicate/object labels',
-						},
+						{ displayName: 'Triple Term ID', name: 'tripleId', type: 'string', default: '' },
+						{ displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+						{ displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
+						{ displayName: 'Atom Term ID (any position)', name: 'atomTermId', type: 'string', default: '' },
+						{ displayName: 'Atom Label (contains, any position)', name: 'atomLabel', type: 'string', default: '' },
+						{ displayName: 'Subject Term ID', name: 'subjectTermId', type: 'string', default: '' },
+						{ displayName: 'Predicate Term ID', name: 'predicateTermId', type: 'string', default: '' },
+						{ displayName: 'Object Term ID', name: 'objectTermId', type: 'string', default: '' },
+						{ displayName: 'Subject Label (contains)', name: 'subjectLabel', type: 'string', default: '' },
+						{ displayName: 'Predicate Label (contains)', name: 'predicateLabel', type: 'string', default: '' },
+						{ displayName: 'Object Label (contains)', name: 'objectLabel', type: 'string', default: '' },
+					],
+				},
+				{
+					displayName: 'Triple Filters (Full)',
+					name: 'tripleFiltersFull',
+					type: 'collection',
+					placeholder: 'Add a filter',
+					default: {},
+					displayOptions: { show: { operation: ['searchTriples'], lightOutput: [false] } },
+					options: [
+						{ displayName: 'Triple Term ID', name: 'tripleId', type: 'string', default: '' },
+						{ displayName: 'Transaction Hash', name: 'transactionHash', type: 'string', default: '' },
+						{ displayName: 'Creator ID', name: 'creatorId', type: 'string', default: '' },
+						{ displayName: 'Block Number Min', name: 'blockNumberMin', type: 'number', default: 0 },
+						{ displayName: 'Block Number Max', name: 'blockNumberMax', type: 'number', default: 0 },
+						{ displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+						{ displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
+						{ displayName: 'Atom Term ID (any position)', name: 'atomTermId', type: 'string', default: '' },
+						{ displayName: 'Atom Label (contains, any position)', name: 'atomLabel', type: 'string', default: '' },
+						{ displayName: 'Subject Term ID', name: 'subjectTermId', type: 'string', default: '' },
+						{ displayName: 'Predicate Term ID', name: 'predicateTermId', type: 'string', default: '' },
+						{ displayName: 'Object Term ID', name: 'objectTermId', type: 'string', default: '' },
+						{ displayName: 'Subject Label (contains)', name: 'subjectLabel', type: 'string', default: '' },
+						{ displayName: 'Predicate Label (contains)', name: 'predicateLabel', type: 'string', default: '' },
+						{ displayName: 'Object Label (contains)', name: 'objectLabel', type: 'string', default: '' },
+						{ displayName: 'Subject Type', name: 'subjectType', type: 'string', default: '' },
+						{ displayName: 'Predicate Type', name: 'predicateType', type: 'string', default: '' },
+						{ displayName: 'Object Type', name: 'objectType', type: 'string', default: '' },
+						{ displayName: 'Subject Emoji', name: 'subjectEmoji', type: 'string', default: '' },
+						{ displayName: 'Predicate Emoji', name: 'predicateEmoji', type: 'string', default: '' },
+						{ displayName: 'Object Emoji', name: 'objectEmoji', type: 'string', default: '' },
+						{ displayName: 'Subject Creator ID', name: 'subjectCreatorId', type: 'string', default: '' },
+						{ displayName: 'Predicate Creator ID', name: 'predicateCreatorId', type: 'string', default: '' },
+						{ displayName: 'Object Creator ID', name: 'objectCreatorId', type: 'string', default: '' },
+						{ displayName: 'Subject Data (contains)', name: 'subjectDataContains', type: 'string', default: '' },
+						{ displayName: 'Predicate Data (contains)', name: 'predicateDataContains', type: 'string', default: '' },
+						{ displayName: 'Object Data (contains)', name: 'objectDataContains', type: 'string', default: '' },
+						{ displayName: 'Subject Image (contains)', name: 'subjectImageContains', type: 'string', default: '' },
+						{ displayName: 'Predicate Image (contains)', name: 'predicateImageContains', type: 'string', default: '' },
+						{ displayName: 'Object Image (contains)', name: 'objectImageContains', type: 'string', default: '' },
 					],
 				},
 				{
@@ -341,7 +341,8 @@ import * as BaseSepolia from './modules/BaseSepolia';
 					);
 					break;
 				case 'searchAtoms': {
-					const filters = (this.getNodeParameter('atomFilters', i, {}) as IDataObject) || {};
+					const isLight = this.getNodeParameter('lightOutput', i, false) as boolean;
+					const filters = (this.getNodeParameter(isLight ? 'atomFiltersLight' : 'atomFiltersFull', i, {}) as IDataObject) || {};
 					const limit = (this.getNodeParameter('limit', i, 10) as number) ?? 10;
 					const offset = (this.getNodeParameter('offset', i, 0) as number) ?? 0;
 					const useAtomSort = this.getNodeParameter('useAtomSort', i, false) as boolean;
@@ -385,7 +386,8 @@ import * as BaseSepolia from './modules/BaseSepolia';
 					break;
 				}
 				case 'searchTriples': {
-					const filters = (this.getNodeParameter('tripleFilters', i, {}) as IDataObject) || {};
+					const isLightT = this.getNodeParameter('lightOutput', i, false) as boolean;
+					const filters = (this.getNodeParameter(isLightT ? 'tripleFiltersLight' : 'tripleFiltersFull', i, {}) as IDataObject) || {};
 					const limit = (this.getNodeParameter('limit', i, 10) as number) ?? 10;
 					const offset = (this.getNodeParameter('offset', i, 0) as number) ?? 0;
 					const useTripleRelative = this.getNodeParameter('useTripleRelativeTime', i, false) as boolean;
