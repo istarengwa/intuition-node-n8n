@@ -7,7 +7,6 @@ import {
 } from 'n8n-workflow';
 
 import { GraphQLClient } from 'graphql-request';
-import * as Base from './modules/Base';
 import * as BaseSepolia from './modules/BaseSepolia';
 
 export class IntuitionFetch implements INodeType {
@@ -28,12 +27,10 @@ export class IntuitionFetch implements INodeType {
 				name: 'endpoint',
 				type: 'options',
 				options: [
-					{ name: '[OffChain] Playground API', value: 'railsMockApi' },
-					{ name: 'Base Testnet', value: 'baseSepolia' },
-					{ name: 'Base Mainnet', value: 'base' },
+					{ name: 'Intuition Testnet (Base Sepolia)', value: 'baseSepolia' },
 				],
-				default: 'base',
-				description: 'Select the API endpoint to use',
+				default: 'baseSepolia',
+				description: 'API endpoint (testnet only)',
 			},
 			{
 				displayName: 'Operation',
@@ -125,11 +122,11 @@ export class IntuitionFetch implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 
 		for (let i = 0; i < items.length; i++) {
-			const endpoint = this.getNodeParameter('endpoint', i) as 'railsMockApi' | 'base' | 'baseSepolia';
+			const endpoint = this.getNodeParameter('endpoint', i) as 'baseSepolia';
 			const operation = this.getNodeParameter('operation', i) as string;
 
-			// Sélection automatique du module selon l'endpoint
-			const module = endpoint === 'baseSepolia' ? BaseSepolia : Base;
+			// Testnet-only module
+			const module = BaseSepolia;
 
 			// Création du client GraphQL
 			const endpoints = module.ENDPOINTS as Record<string, { url: string }>;

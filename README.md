@@ -39,7 +39,9 @@ pnpm dev
 
 ### ✅ `Intuition Fetch`
 
-This node allows you to interact with the Intuition GraphQL API using different endpoints (`railsMockApi`, `base`, `baseSepolia`) and execute various operations:
+This node allows you to interact with the Intuition GraphQL API on the public testnet (testnet-only for now):
+
+- Intuition Testnet (Base Sepolia Indexer): `https://testnet.intuition.sh/v1/graphql`
 
 | Operation                  | Description                                                                       |
 | -------------------------- | --------------------------------------------------------------------------------- |
@@ -61,17 +63,18 @@ This node allows you to interact with the Intuition GraphQL API using different 
     IntuitionFetch.node.ts       ← Main node logic
 
 /modules
-  Base.ts                        ← Endpoint definition (Mainnet + Mock)
   BaseSepolia.ts                 ← Testnet endpoint + exports
-  Atoms.ts                       ← Atom-related fetch functions
-  Triples.ts                     ← Triple-related fetch functions
+  AtomsSepolia.ts                ← Atom-related fetch functions (testnet)
+  TriplesSepolia.ts              ← Triple-related fetch functions (testnet)
 ```
 
 ---
 
 ## 🔐 Authentication
 
-No authentication is required at the moment for the public Intuition GraphQL endpoints (`base` and `baseSepolia`).
+No authentication is required for the public GraphQL endpoint listed above. Rate limits may apply.
+
+Note: The GraphQL schema has been updated in v1.5. Fields like `id` have been replaced by `term_id`, and several nested shapes have changed. This repository has been migrated accordingly.
 
 ---
 
