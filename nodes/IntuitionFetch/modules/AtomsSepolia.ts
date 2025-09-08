@@ -88,8 +88,8 @@ export async function searchAtoms(
   filters: AtomSearchFilters = {},
   limit = 10,
   offset = 0,
-  sortBy: 'created_at' | 'block_number' | 'label' | 'term_id' = 'created_at',
-  sortDir: 'asc' | 'desc' = 'desc',
+  sortBy?: 'created_at' | 'block_number',
+  sortDir?: 'asc' | 'desc',
   output: 'light' | 'full' = 'full',
 ) {
   const andConditions: any[] = [];
@@ -109,7 +109,7 @@ export async function searchAtoms(
 
   if (andConditions.length) where._and = andConditions;
 
-  const orderBy = [{ [sortBy]: sortDir }];
+  const orderBy = sortBy ? [{ [sortBy]: sortDir ?? 'desc' }] : undefined;
 
   const selection = output === 'light' ? atomsLightSelection : atomsFullSelection;
   const query = `
@@ -120,6 +120,7 @@ export async function searchAtoms(
     }
   `;
 
-  const variables = { where, limit, offset, orderBy };
+  const variables: Record<string, any> = { where, limit, offset };
+  if (orderBy) variables.orderBy = orderBy;
   return client.request(query, variables);
 }

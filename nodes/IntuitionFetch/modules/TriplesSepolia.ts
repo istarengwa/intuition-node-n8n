@@ -75,6 +75,8 @@ export interface TripleSearchFilters {
   tripleId?: string;
   atomTermId?: string; // match subject_id OR predicate_id OR object_id
   atomLabel?: string;  // match any of subject/predicate/object label
+  createdAtFrom?: string;
+  createdAtTo?: string;
 }
 
 export async function searchTriples(
@@ -82,6 +84,8 @@ export async function searchTriples(
   filters: TripleSearchFilters = {},
   limit = 10,
   offset = 0,
+  sortBy?: 'created_at' | 'block_number',
+  sortDir?: 'asc' | 'desc',
   output: 'light' | 'full' = 'full',
 ) {
   const andConditions: any[] = [];
@@ -111,17 +115,26 @@ export async function searchTriples(
     });
   }
 
+  if (filters.createdAtFrom) {
+    andConditions.push({ created_at: { _gte: filters.createdAtFrom } });
+  }
+  if (filters.createdAtTo) {
+    andConditions.push({ created_at: { _lte: filters.createdAtTo } });
+  }
+
   const where = andConditions.length ? { _and: andConditions } : {};
 
   const selection = output === 'light' ? tripleLightSelection : tripleSelection;
+  const orderBy = sortBy ? [{ [sortBy]: sortDir ?? 'desc' }] : undefined;
   const query = `
-    query SearchTriples($where: triples_bool_exp, $limit: Int, $offset: Int) {
-      triples(where: $where, limit: $limit, offset: $offset) {
+    query SearchTriples($where: triples_bool_exp, $limit: Int, $offset: Int, $orderBy: [triples_order_by!]) {
+      triples(where: $where, limit: $limit, offset: $offset, order_by: $orderBy) {
         ${selection}
       }
     }
   `;
 
-  const variables = { where, limit, offset };
+  const variables: Record<string, any> = { where, limit, offset };
+  if (orderBy) variables.orderBy = orderBy;
   return client.request(query, variables);
 }

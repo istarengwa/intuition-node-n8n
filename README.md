@@ -84,11 +84,11 @@ Use cases:
 
 - Atoms (`Search Atoms`):
   - Filters (all optional): `term_id`, `label` (contains), `type`, `wallet_id`, `transaction_hash`, `emoji`, `image` (contains), `block_number` min/max, `created_at` from/to.
-  - Sorting: by `created_at`, `block_number` with direction asc/desc.
-  - Relative time: enable “Use Relative Time Filter” and set amount + unit to filter atoms created in the last X seconds/minutes/hours/days.
+  - Sorting: optional, by `created_at`, `block_number`, with direction asc/desc.
+  - Relative time: enable “Use Relative Time Filter” and set amount + unit.
 - Triples (`Search Triples`):
-  - Filters (all optional): `triple term_id`, `atom term_id` (matches subject/predicate/object), `atom label` (contains across subject/predicate/object).
-  - Sorting: not exposed.
+  - Filters (all optional): `triple term_id`, `atom term_id` (matches subject/predicate/object), `atom label` (contains), optional relative-time filter (created within last X seconds/minutes/hours/days).
+  - Sorting: optional, by `created_at` or `block_number`, with direction asc/desc.
 
 ### Triple Output Fields (v1.5 schema)
 - Triple: `term_id`, `created_at`, `block_number`, `transaction_hash`, `creator_id`, `creator { id, label, image, atom_id, type }`

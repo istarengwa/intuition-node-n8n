@@ -185,6 +185,8 @@ export class IntuitionTrigger implements INodeType {
         },
         pageSize,
         0,
+        undefined,
+        undefined,
         light ? 'light' : 'full',
       )) as IDataObject;
 

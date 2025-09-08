@@ -173,7 +173,7 @@ import * as BaseSepolia from './modules/BaseSepolia';
 						{ name: 'Block Number', value: 'block_number' },
 					],
 					default: 'created_at',
-					displayOptions: { show: { operation: ['searchAtoms'] } },
+					displayOptions: { show: { operation: ['searchAtoms'], useAtomSort: [true] } },
 				},
 				{
 					displayName: 'Atom Sort Direction',
@@ -184,7 +184,15 @@ import * as BaseSepolia from './modules/BaseSepolia';
 						{ name: 'Ascending', value: 'asc' },
 					],
 					default: 'desc',
+					displayOptions: { show: { operation: ['searchAtoms'], useAtomSort: [true] } },
+				},
+				{
+					displayName: 'Use Atom Sorting',
+					name: 'useAtomSort',
+					type: 'boolean',
+					default: false,
 					displayOptions: { show: { operation: ['searchAtoms'] } },
+					description: 'Apply sorting to atom search results',
 				},
 				{
 					displayName: 'Triple Filters',
@@ -218,6 +226,64 @@ import * as BaseSepolia from './modules/BaseSepolia';
 							description: 'Case-insensitive substring match across subject/predicate/object labels',
 						},
 					],
+				},
+				{
+					displayName: 'Use Triple Relative Time Filter',
+					name: 'useTripleRelativeTime',
+					type: 'boolean',
+					default: false,
+					displayOptions: { show: { operation: ['searchTriples'] } },
+					description: 'Filter triples created in the last X time units',
+				},
+				{
+					displayName: 'Relative Amount',
+					name: 'tripleRelativeAmount',
+					type: 'number',
+					default: 60,
+					displayOptions: { show: { operation: ['searchTriples'], useTripleRelativeTime: [true] } },
+				},
+				{
+					displayName: 'Relative Unit',
+					name: 'tripleRelativeUnit',
+					type: 'options',
+					options: [
+						{ name: 'Seconds', value: 'seconds' },
+						{ name: 'Minutes', value: 'minutes' },
+						{ name: 'Hours', value: 'hours' },
+						{ name: 'Days', value: 'days' },
+					],
+					default: 'minutes',
+					displayOptions: { show: { operation: ['searchTriples'], useTripleRelativeTime: [true] } },
+				},
+				{
+					displayName: 'Use Triple Sorting',
+					name: 'useTripleSort',
+					type: 'boolean',
+					default: false,
+					displayOptions: { show: { operation: ['searchTriples'] } },
+					description: 'Apply sorting to triple search results',
+				},
+				{
+					displayName: 'Triple Sort By',
+					name: 'tripleSortBy',
+					type: 'options',
+					options: [
+						{ name: 'Created At', value: 'created_at' },
+						{ name: 'Block Number', value: 'block_number' },
+					],
+					default: 'created_at',
+					displayOptions: { show: { operation: ['searchTriples'], useTripleSort: [true] } },
+				},
+				{
+					displayName: 'Triple Sort Direction',
+					name: 'tripleSortDir',
+					type: 'options',
+					options: [
+						{ name: 'Descending', value: 'desc' },
+						{ name: 'Ascending', value: 'asc' },
+					],
+					default: 'desc',
+					displayOptions: { show: { operation: ['searchTriples'], useTripleSort: [true] } },
 				},
 				{
 					displayName: 'Limit',
@@ -278,8 +344,9 @@ import * as BaseSepolia from './modules/BaseSepolia';
 					const filters = (this.getNodeParameter('atomFilters', i, {}) as IDataObject) || {};
 					const limit = (this.getNodeParameter('limit', i, 10) as number) ?? 10;
 					const offset = (this.getNodeParameter('offset', i, 0) as number) ?? 0;
-					const sortBy = (this.getNodeParameter('atomSortBy', i, 'created_at') as string) as 'created_at' | 'block_number';
-					const sortDir = (this.getNodeParameter('atomSortDir', i, 'desc') as string) as 'asc' | 'desc';
+					const useAtomSort = this.getNodeParameter('useAtomSort', i, false) as boolean;
+					const sortBy = useAtomSort ? ((this.getNodeParameter('atomSortBy', i, 'created_at') as string) as 'created_at' | 'block_number') : undefined;
+					const sortDir = useAtomSort ? ((this.getNodeParameter('atomSortDir', i, 'desc') as string) as 'asc' | 'desc') : undefined;
 					const useRelative = this.getNodeParameter('useRelativeTime', i, false) as boolean;
 					if (useRelative) {
 						const amount = (this.getNodeParameter('relativeAmount', i, 60) as number) ?? 60;
@@ -321,15 +388,31 @@ import * as BaseSepolia from './modules/BaseSepolia';
 					const filters = (this.getNodeParameter('tripleFilters', i, {}) as IDataObject) || {};
 					const limit = (this.getNodeParameter('limit', i, 10) as number) ?? 10;
 					const offset = (this.getNodeParameter('offset', i, 0) as number) ?? 0;
+					const useTripleRelative = this.getNodeParameter('useTripleRelativeTime', i, false) as boolean;
+					if (useTripleRelative) {
+						const amount = (this.getNodeParameter('tripleRelativeAmount', i, 60) as number) ?? 60;
+						const unit = (this.getNodeParameter('tripleRelativeUnit', i, 'minutes') as string) as 'seconds' | 'minutes' | 'hours' | 'days';
+						const msPerUnit = { seconds: 1000, minutes: 60 * 1000, hours: 60 * 60 * 1000, days: 24 * 60 * 60 * 1000 };
+						const now = Date.now();
+						const fromIso = new Date(now - Math.max(0, amount) * msPerUnit[unit]).toISOString();
+						(filters as IDataObject).createdAtFrom = fromIso;
+					}
+					const useTripleSort = this.getNodeParameter('useTripleSort', i, false) as boolean;
+					const tripleSortBy = useTripleSort ? ((this.getNodeParameter('tripleSortBy', i, 'created_at') as string) as 'created_at' | 'block_number') : undefined;
+					const tripleSortDir = useTripleSort ? ((this.getNodeParameter('tripleSortDir', i, 'desc') as string) as 'asc' | 'desc') : undefined;
 					result = await module.searchTriples(
 						client,
 						{
 							tripleId: (filters.tripleId as string) || undefined,
 							atomTermId: (filters.atomTermId as string) || undefined,
 							atomLabel: (filters.atomLabel as string) || undefined,
+							createdAtFrom: (filters.createdAtFrom as string) || undefined,
+							createdAtTo: (filters.createdAtTo as string) || undefined,
 						},
 						limit,
 						offset,
+						tripleSortBy,
+						tripleSortDir,
 						(this.getNodeParameter('lightOutput', i, false) as boolean) ? 'light' : 'full',
 					);
 					break;
