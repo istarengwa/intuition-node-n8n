@@ -18,10 +18,10 @@ cd intuition-node-n8n
 ### 2. Install dependencies
 
 ```bash
-pnpm install
+npm install
 ```
 
-> Make sure you are using Node.js 18+ and `pnpm` version 9 or higher.
+> Make sure you are using Node.js 20+ and `npm` version 9 or higher.
 
 ### 3. Run in development mode
 
@@ -46,12 +46,9 @@ This node allows you to interact with the Intuition GraphQL API on the public te
 | Operation                  | Description                                                                       |
 | -------------------------- | --------------------------------------------------------------------------------- |
 | `fetchTriples`             | Fetch all available triples                                                       |
-| `fetchTriplesForSubject`   | Fetch triples where a specific `subject.id` is involved                           |
-| `fetchTriplesForPredicate` | Fetch triples with a given predicate ID                                           |
-| `fetchTriplesForObject`    | Fetch triples linked to a specific object                                         |
-| `fetchTripleById`          | Fetch a single triple using its unique ID                                         |
 | `fetchAtoms`               | Retrieve a full list of atoms and their metadata (label, value, vault info, etc.) |
-| `fetchAtomDetails`         | Fetch detailed data about a specific atom                                         |
+| `searchAtoms`              | Search atoms by optional filters (term_id, label, type, wallet_id, transaction_hash, emoji, image contains, block_number min/max, created_at from/to) + sorting (created_at, block_number) |
+| `searchTriples`            | Search triples by optional filters (triple term_id, atom term_id, atom label across subject/predicate/object) |
 
 ---
 
@@ -66,6 +63,56 @@ This node allows you to interact with the Intuition GraphQL API on the public te
   BaseSepolia.ts                 ← Testnet endpoint + exports
   AtomsSepolia.ts                ← Atom-related fetch functions (testnet)
   TriplesSepolia.ts              ← Triple-related fetch functions (testnet)
+  (includes flexible search helpers)
+
+### 🔔 `Intuition Trigger`
+
+Emits new items automatically at a schedule (polling):
+
+- Resource: `Atoms` or `Triples`
+- Filters: same spirit as `Search` operations (all optional)
+- Start From Now: ignores existing data on first run; only emits new items afterwards
+- Page Size: max items checked per poll
+
+Use cases:
+- Notify when a new atom with label contains “The Hacking Project” appears
+- Notify when a new triple involves a given atom (by label or term_id) in any position
+
+---
+
+## 🔎 Searching & Sorting
+
+- Atoms (`Search Atoms`):
+  - Filters (all optional): `term_id`, `label` (contains), `type`, `wallet_id`, `transaction_hash`, `emoji`, `image` (contains), `block_number` min/max, `created_at` from/to.
+  - Sorting: by `created_at`, `block_number` with direction asc/desc.
+  - Relative time: enable “Use Relative Time Filter” and set amount + unit to filter atoms created in the last X seconds/minutes/hours/days.
+- Triples (`Search Triples`):
+  - Filters (all optional): `triple term_id`, `atom term_id` (matches subject/predicate/object), `atom label` (contains across subject/predicate/object).
+  - Sorting: not exposed.
+
+### Triple Output Fields (v1.5 schema)
+- Triple: `term_id`, `created_at`, `block_number`, `transaction_hash`, `creator_id`, `creator { id, label, image, atom_id, type }`
+- Subject/Predicate/Object (atoms):
+  - Basic: `term_id`, `label`, `image`, `emoji`, `type`, `data`, `creator { id, label, image, atom_id, type }`
+  - Term metrics: `term { total_market_cap, updated_at }`
+  - Aggregates: `positions_aggregate { aggregate { count } }`, and `as_subject_triples_aggregate / as_predicate_triples_aggregate / as_object_triples_aggregate { aggregate { count } }`
+
+Notes:
+- Legacy fields `id`, `block_timestamp`, `vault`, `counter_vault`, `total_shares` are replaced by `term_id`, `created_at`, `term{...}` and `total_market_cap` respectively.
+
+---
+
+## ⚖️ Output Mode (Light vs Full)
+
+- Parameter: `Light Output` (boolean) on Fetch/Search/Trigger nodes.
+- Light:
+  - Triples: `term_id`, `created_at`, and for each atom: `term_id`, `label`.
+  - Atoms: `term_id`, `label`, `emoji`, `image`, `type`, `data`, `block_number`, `created_at`, `transaction_hash`, `wallet_id`, and aggregate counts.
+- Full:
+  - Triples: adds `block_number`, `transaction_hash`, `creator_id`, `creator{...}` and extended subject/predicate/object fields including aggregates and term metrics.
+  - Atoms: adds `creator{...}`, `term{ total_market_cap, updated_at }`, positions and detailed related triples.
+
+Tip: To detect new triples involving a specific atom label (e.g. “The Hacking Project”), set `Operation = Search Triples`, `Atom Label (contains) = The Hacking Project`, choose sort `Term ID` desc, and optionally deduplicate with workflow static data before posting to Discord.
 ```
 
 ---

@@ -22,7 +22,6 @@
   "packageManager": "pnpm@9.1.4",
   "main": "index.js",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "build": "tsc && gulp build:icons",
     "dev": "n8n start",
     "format": "prettier nodes credentials --write",
@@ -41,7 +40,9 @@
     ],
     "nodes": [
       "dist/nodes/ExampleNode/ExampleNode.node.js",
-      "dist/nodes/HttpBin/HttpBin.node.js"
+      "dist/nodes/HttpBin/HttpBin.node.js",
+      "dist/nodes/IntuitionFetch/IntuitionFetch.node.js",
+      "dist/nodes/IntuitionTrigger/IntuitionTrigger.node.js"
     ]
   },
   "devDependencies": {
