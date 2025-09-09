@@ -1,6 +1,6 @@
 import { INodeExecutionData, IPollFunctions } from 'n8n-workflow';
 import { GraphQLClient } from 'graphql-request';
-import * as BaseSepolia from '../../IntuitionFetch/modules/BaseSepolia';
+import * as Base from '../../IntuitionFetch/modules/Base';
 
 export async function handleVaultsPoll(
   fn: IPollFunctions,
@@ -23,7 +23,7 @@ export async function handleVaultsPoll(
   const sortDir = useSort ? ((fn.getNodeParameter('vaultSortDir', 'desc') as string) as 'asc' | 'desc') : undefined;
   const pageSize = (fn.getNodeParameter('pageSize', 50) as number) ?? 50;
 
-  const result = (await BaseSepolia.searchVaults(
+  const result = (await Base.searchVaults(
     client,
     {
       termId: (filters.termId as string) || undefined,
@@ -80,4 +80,3 @@ export async function handleVaultsPoll(
 
   return items.length ? items : null;
 }
-

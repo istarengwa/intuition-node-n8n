@@ -1,6 +1,6 @@
 import { INodeExecutionData, IPollFunctions } from 'n8n-workflow';
 import { GraphQLClient } from 'graphql-request';
-import * as BaseSepolia from '../../IntuitionFetch/modules/BaseSepolia';
+import * as Base from '../../IntuitionFetch/modules/Base';
 
 export async function handlePositionsPoll(
   fn: IPollFunctions,
@@ -22,7 +22,7 @@ export async function handlePositionsPoll(
   const sortDir = useSort ? ((fn.getNodeParameter('positionSortDir', 'desc') as string) as 'asc' | 'desc') : undefined;
   const pageSize = (fn.getNodeParameter('pageSize', 50) as number) ?? 50;
 
-  const result = (await BaseSepolia.searchPositions(
+  const result = (await Base.searchPositions(
     client,
     {
       id: (filters.id as string) || undefined,
@@ -76,4 +76,3 @@ export async function handlePositionsPoll(
 
   return items.length ? items : null;
 }
-

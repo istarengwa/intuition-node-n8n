@@ -5,7 +5,7 @@ import {
 } from 'n8n-workflow';
 
 import { GraphQLClient } from 'graphql-request';
-import * as BaseSepolia from '../../IntuitionFetch/modules/BaseSepolia';
+import * as Base from '../../IntuitionFetch/modules/Base';
 
 export async function handleAtomsPoll(
   fn: IPollFunctions,
@@ -45,7 +45,7 @@ export async function handleAtomsPoll(
   const sortBy = useSort ? ((fn.getNodeParameter('atomSortBy', 'created_at') as string) as 'created_at' | 'block_number') : 'created_at';
   const sortDir = useSort ? ((fn.getNodeParameter('atomSortDir', 'asc') as string) as 'asc' | 'desc') : 'asc';
 
-  const result = (await BaseSepolia.searchAtoms(
+  const result = (await Base.searchAtoms(
     client,
     {
       termId: (filters.termId as string) || undefined,
@@ -88,4 +88,3 @@ export async function handleAtomsPoll(
 
   return items.length ? items : null;
 }
-

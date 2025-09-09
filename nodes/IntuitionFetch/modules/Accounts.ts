@@ -79,3 +79,4 @@ export async function searchAccounts(
   if (orderBy) variables.orderBy = orderBy;
   return client.request(query, variables);
 }
+

@@ -1,7 +1,7 @@
 import { INodeExecutionData, INodeType, INodeTypeDescription, IPollFunctions } from 'n8n-workflow';
 
 import { GraphQLClient } from 'graphql-request';
-import * as BaseSepolia from '../IntuitionFetch/modules/BaseSepolia';
+import * as Base from '../IntuitionFetch/modules/Base';
 import { handleAtomsPoll } from './modules/AtomsTrigger';
 import { handleTriplesPoll } from './modules/TriplesTrigger';
 import { handleAccountsPoll } from './modules/AccountsTrigger';
@@ -27,9 +27,9 @@ export class IntuitionTrigger implements INodeType {
         name: 'endpoint',
         type: 'options',
         options: [
-          { name: 'Intuition Testnet', value: 'baseSepolia' },
+          { name: 'Intuition Testnet', value: 'testnet' },
         ],
-        default: 'baseSepolia',
+        default: 'testnet',
         description: 'API endpoint (testnet only)',
       },
       {
@@ -390,13 +390,20 @@ export class IntuitionTrigger implements INodeType {
         description: 'Maximum number of seen triple IDs to remember for deduplication',
         displayOptions: { show: { resource: ['triples'] } },
       },
+      // Footer notice
+      {
+        displayName: '💜 Powered by Istarengwa - CEO The Hacking Project',
+        name: 'poweredByIstarengwa',
+        type: 'notice',
+        default: '',
+      },
     ],
   };
 
   async poll(this: IPollFunctions): Promise<INodeExecutionData[][] | null> {
-    const endpoint = this.getNodeParameter('endpoint') as 'baseSepolia';
+    const endpoint = this.getNodeParameter('endpoint') as string;
     const resource = this.getNodeParameter('resource') as 'atoms' | 'triples';
-    const module = BaseSepolia;
+    const module = Base;
     const endpoints = module.ENDPOINTS as Record<string, { url: string }>;
     const client = new GraphQLClient(endpoints[endpoint].url);
 

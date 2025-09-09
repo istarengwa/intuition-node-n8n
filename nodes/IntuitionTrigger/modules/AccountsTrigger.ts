@@ -1,6 +1,6 @@
 import { INodeExecutionData, IPollFunctions } from 'n8n-workflow';
 import { GraphQLClient } from 'graphql-request';
-import * as BaseSepolia from '../../IntuitionFetch/modules/BaseSepolia';
+import * as Base from '../../IntuitionFetch/modules/Base';
 
 export async function handleAccountsPoll(
   fn: IPollFunctions,
@@ -24,7 +24,7 @@ export async function handleAccountsPoll(
 
   const pageSize = (fn.getNodeParameter('pageSize', 50) as number) ?? 50;
 
-  const result = (await BaseSepolia.searchAccounts(
+  const result = (await Base.searchAccounts(
     client,
     {
       id: (filters.id as string) || undefined,
