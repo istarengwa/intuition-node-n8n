@@ -26,9 +26,7 @@ npm install
 ### 3. Run in development mode
 
 ```bash
-N8N_ENABLE_CUSTOM_EXTENSIONS=true \
-N8N_CUSTOM_EXTENSIONS=./dist \
-pnpm dev
+npm run dev
 ```
 
 > Ensure that port `5678` is free or set a different port using the `PORT` environment variable.
