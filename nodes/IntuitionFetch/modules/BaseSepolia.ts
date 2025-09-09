@@ -1,11 +1,16 @@
-import { IntuitionEndpoint } from './Base';
-  
+// Local, minimal typing to avoid depending on deprecated Base module
+export interface IntuitionEndpoint { url: string }
+
 export const ENDPOINTS: Record<'baseSepolia', IntuitionEndpoint> = {
   baseSepolia: {
-    url: 'https://api.i7n.dev/v1/graphql',
+    // Public testnet indexer
+    url: 'https://testnet.intuition.sh/v1/graphql',
   },
 };
 
-export * from './Triples';
-export * from './Atoms';
-  
+// Re-export the testnet-specific operations to keep the original usage pattern
+export * from './TriplesSepolia';
+export * from './AtomsSepolia';
+export * from './AccountsSepolia';
+export * from './PositionsSepolia';
+export * from './VaultsSepolia';
