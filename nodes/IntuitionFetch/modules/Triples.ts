@@ -73,15 +73,14 @@ export async function fetchTriples(client: GraphQLClient, output: 'light' | 'ful
 
 export interface TripleSearchFilters {
   tripleId?: string;
-  atomTermId?: string; // match subject_id OR predicate_id OR object_id
-  atomLabel?: string;  // match any of subject/predicate/object label
+  atomTermId?: string;
+  atomLabel?: string;
   createdAtFrom?: string;
   createdAtTo?: string;
   transactionHash?: string;
   creatorId?: string;
   blockNumberMin?: number;
   blockNumberMax?: number;
-  // per-position filters
   subjectTermId?: string;
   predicateTermId?: string;
   objectTermId?: string;
@@ -116,52 +115,32 @@ export async function searchTriples(
 ) {
   const andConditions: any[] = [];
 
-  if (filters.tripleId) {
-    andConditions.push({ term_id: { _eq: filters.tripleId } });
-  }
+  if (filters.tripleId) andConditions.push({ term_id: { _eq: filters.tripleId } });
 
   if (filters.atomTermId) {
-    andConditions.push({
-      _or: [
-        { subject_id: { _eq: filters.atomTermId } },
-        { predicate_id: { _eq: filters.atomTermId } },
-        { object_id: { _eq: filters.atomTermId } },
-      ],
-    });
+    andConditions.push({ _or: [
+      { subject_id: { _eq: filters.atomTermId } },
+      { predicate_id: { _eq: filters.atomTermId } },
+      { object_id: { _eq: filters.atomTermId } },
+    ]});
   }
 
   if (filters.atomLabel) {
     const like = `%${filters.atomLabel}%`;
-    andConditions.push({
-      _or: [
-        { subject: { label: { _ilike: like } } },
-        { predicate: { label: { _ilike: like } } },
-        { object: { label: { _ilike: like } } },
-      ],
-    });
+    andConditions.push({ _or: [
+      { subject: { label: { _ilike: like } } },
+      { predicate: { label: { _ilike: like } } },
+      { object: { label: { _ilike: like } } },
+    ]});
   }
 
-  if (filters.createdAtFrom) {
-    andConditions.push({ created_at: { _gte: filters.createdAtFrom } });
-  }
-  if (filters.createdAtTo) {
-    andConditions.push({ created_at: { _lte: filters.createdAtTo } });
-  }
+  if (filters.createdAtFrom) andConditions.push({ created_at: { _gte: filters.createdAtFrom } });
+  if (filters.createdAtTo) andConditions.push({ created_at: { _lte: filters.createdAtTo } });
+  if (filters.transactionHash) andConditions.push({ transaction_hash: { _eq: filters.transactionHash } });
+  if (filters.creatorId) andConditions.push({ creator_id: { _eq: filters.creatorId } });
+  if (typeof filters.blockNumberMin === 'number') andConditions.push({ block_number: { _gte: filters.blockNumberMin } });
+  if (typeof filters.blockNumberMax === 'number') andConditions.push({ block_number: { _lte: filters.blockNumberMax } });
 
-  if (filters.transactionHash) {
-    andConditions.push({ transaction_hash: { _eq: filters.transactionHash } });
-  }
-  if (filters.creatorId) {
-    andConditions.push({ creator_id: { _eq: filters.creatorId } });
-  }
-  if (typeof filters.blockNumberMin === 'number') {
-    andConditions.push({ block_number: { _gte: filters.blockNumberMin } });
-  }
-  if (typeof filters.blockNumberMax === 'number') {
-    andConditions.push({ block_number: { _lte: filters.blockNumberMax } });
-  }
-
-  // Position-specific filters
   if (filters.subjectTermId) andConditions.push({ subject_id: { _eq: filters.subjectTermId } });
   if (filters.predicateTermId) andConditions.push({ predicate_id: { _eq: filters.predicateTermId } });
   if (filters.objectTermId) andConditions.push({ object_id: { _eq: filters.objectTermId } });
@@ -206,3 +185,4 @@ export async function searchTriples(
   if (orderBy) variables.orderBy = orderBy;
   return client.request(query, variables);
 }
+

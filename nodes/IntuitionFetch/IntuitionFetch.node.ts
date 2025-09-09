@@ -7,7 +7,7 @@ import {
 } from 'n8n-workflow';
 
 import { GraphQLClient } from 'graphql-request';
-import * as BaseSepolia from './modules/BaseSepolia';
+import * as Base from './modules/Base';
 
 	export class IntuitionFetch implements INodeType {
 		description: INodeTypeDescription = {
@@ -27,9 +27,9 @@ import * as BaseSepolia from './modules/BaseSepolia';
 					name: 'endpoint',
 					type: 'options',
 					options: [
-						{ name: 'Intuition Testnet', value: 'baseSepolia' },
+						{ name: 'Intuition Testnet', value: 'testnet' },
 					],
-					default: 'baseSepolia',
+					default: 'testnet',
 					description: 'API endpoint (testnet only)',
 				},
 				{
@@ -581,11 +581,11 @@ import * as BaseSepolia from './modules/BaseSepolia';
 		const returnData: INodeExecutionData[] = [];
 
 		for (let i = 0; i < items.length; i++) {
-			const endpoint = this.getNodeParameter('endpoint', i) as 'baseSepolia';
+					const endpoint = this.getNodeParameter('endpoint', i) as string;
 			const operation = this.getNodeParameter('operation', i) as string;
 
 			// Testnet-only module
-			const module = BaseSepolia;
+					const module = Base;
 
 			// Création du client GraphQL
 			const endpoints = module.ENDPOINTS as Record<string, { url: string }>;

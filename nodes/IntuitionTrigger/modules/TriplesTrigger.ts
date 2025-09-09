@@ -5,7 +5,7 @@ import {
 } from 'n8n-workflow';
 
 import { GraphQLClient } from 'graphql-request';
-import * as BaseSepolia from '../../IntuitionFetch/modules/BaseSepolia';
+import * as Base from '../../IntuitionFetch/modules/Base';
 
 export async function handleTriplesPoll(
   fn: IPollFunctions,
@@ -36,7 +36,7 @@ export async function handleTriplesPoll(
   const tripleSortBy = useTripleSort ? ((fn.getNodeParameter('tripleSortBy', 'created_at') as string) as 'created_at' | 'block_number') : undefined;
   const tripleSortDir = useTripleSort ? ((fn.getNodeParameter('tripleSortDir', 'desc') as string) as 'asc' | 'desc') : undefined;
 
-  const result = (await BaseSepolia.searchTriples(
+  const result = (await Base.searchTriples(
     client,
     {
       tripleId: (filters.tripleId as string) || undefined,
@@ -110,4 +110,3 @@ export async function handleTriplesPoll(
 
   return items.length ? items : null;
 }
-
