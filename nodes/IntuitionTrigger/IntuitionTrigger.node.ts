@@ -1,13 +1,9 @@
-import {
-  IDataObject,
-  INodeExecutionData,
-  INodeType,
-  INodeTypeDescription,
-  IPollFunctions,
-} from 'n8n-workflow';
+import { INodeExecutionData, INodeType, INodeTypeDescription, IPollFunctions } from 'n8n-workflow';
 
 import { GraphQLClient } from 'graphql-request';
 import * as BaseSepolia from '../IntuitionFetch/modules/BaseSepolia';
+import { handleAtomsPoll } from './modules/AtomsTrigger';
+import { handleTriplesPoll } from './modules/TriplesTrigger';
 
 export class IntuitionTrigger implements INodeType {
   description: INodeTypeDescription = {
@@ -51,23 +47,119 @@ export class IntuitionTrigger implements INodeType {
         default: 'atoms',
         description: 'Which resource to poll for new items',
       },
-      // ATOM FILTERS
+      // ATOM FILTERS (Light)
       {
-        displayName: 'Atom Filters',
-        name: 'atomFilters',
+        displayName: 'Atom Filters (Light)',
+        name: 'atomFiltersLight',
         type: 'collection',
         placeholder: 'Add a filter',
         default: {},
-        displayOptions: { show: { resource: ['atoms'] } },
+        displayOptions: { show: { resource: ['atoms'], lightOutput: [true] } },
         options: [
           { displayName: 'Term ID', name: 'termId', type: 'string', default: '' },
           { displayName: 'Label (contains)', name: 'label', type: 'string', default: '' },
           { displayName: 'Type', name: 'type', type: 'string', default: '' },
           { displayName: 'Wallet ID', name: 'walletId', type: 'string', default: '' },
           { displayName: 'Transaction Hash', name: 'transactionHash', type: 'string', default: '' },
+          { displayName: 'Creator ID', name: 'creatorId', type: 'string', default: '' },
           { displayName: 'Emoji', name: 'emoji', type: 'string', default: '' },
           { displayName: 'Image (contains)', name: 'imageContains', type: 'string', default: '' },
+          { displayName: 'Data (contains)', name: 'dataContains', type: 'string', default: '' },
+          { displayName: 'Block Number Min', name: 'blockNumberMin', type: 'number', default: 0 },
+          { displayName: 'Block Number Max', name: 'blockNumberMax', type: 'number', default: 0 },
+          { displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+          { displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
         ],
+      },
+      // ATOM FILTERS (Full)
+      {
+        displayName: 'Atom Filters (Full)',
+        name: 'atomFiltersFull',
+        type: 'collection',
+        placeholder: 'Add a filter',
+        default: {},
+        displayOptions: { show: { resource: ['atoms'], lightOutput: [false] } },
+        options: [
+          { displayName: 'Term ID', name: 'termId', type: 'string', default: '' },
+          { displayName: 'Label (contains)', name: 'label', type: 'string', default: '' },
+          { displayName: 'Type', name: 'type', type: 'string', default: '' },
+          { displayName: 'Wallet ID', name: 'walletId', type: 'string', default: '' },
+          { displayName: 'Transaction Hash', name: 'transactionHash', type: 'string', default: '' },
+          { displayName: 'Creator ID', name: 'creatorId', type: 'string', default: '' },
+          { displayName: 'Creator Label (contains)', name: 'creatorLabel', type: 'string', default: '' },
+          { displayName: 'Creator Type', name: 'creatorType', type: 'string', default: '' },
+          { displayName: 'Creator Atom ID', name: 'creatorAtomId', type: 'string', default: '' },
+          { displayName: 'Emoji', name: 'emoji', type: 'string', default: '' },
+          { displayName: 'Image (contains)', name: 'imageContains', type: 'string', default: '' },
+          { displayName: 'Data (contains)', name: 'dataContains', type: 'string', default: '' },
+          { displayName: 'Block Number Min', name: 'blockNumberMin', type: 'number', default: 0 },
+          { displayName: 'Block Number Max', name: 'blockNumberMax', type: 'number', default: 0 },
+          { displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+          { displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
+          { displayName: 'Term Total Market Cap Min', name: 'termTotalMarketCapMin', type: 'string', default: '' },
+          { displayName: 'Term Total Market Cap Max', name: 'termTotalMarketCapMax', type: 'string', default: '' },
+          { displayName: 'Term Updated At From', name: 'termUpdatedAtFrom', type: 'dateTime', default: '' },
+          { displayName: 'Term Updated At To', name: 'termUpdatedAtTo', type: 'dateTime', default: '' },
+        ],
+      },
+      // Atom relative time + sorting
+      {
+        displayName: 'Use Atom Relative Time Filter',
+        name: 'useAtomRelativeTime',
+        type: 'boolean',
+        default: false,
+        displayOptions: { show: { resource: ['atoms'] } },
+        description: 'Filter atoms created in the last X time units',
+      },
+      {
+        displayName: 'Relative Amount',
+        name: 'atomRelativeAmount',
+        type: 'number',
+        default: 60,
+        displayOptions: { show: { resource: ['atoms'], useAtomRelativeTime: [true] } },
+      },
+      {
+        displayName: 'Relative Unit',
+        name: 'atomRelativeUnit',
+        type: 'options',
+        options: [
+          { name: 'Seconds', value: 'seconds' },
+          { name: 'Minutes', value: 'minutes' },
+          { name: 'Hours', value: 'hours' },
+          { name: 'Days', value: 'days' },
+        ],
+        default: 'minutes',
+        displayOptions: { show: { resource: ['atoms'], useAtomRelativeTime: [true] } },
+      },
+      {
+        displayName: 'Use Atom Sorting',
+        name: 'useAtomSort',
+        type: 'boolean',
+        default: false,
+        displayOptions: { show: { resource: ['atoms'] } },
+        description: 'Apply sorting to atom results',
+      },
+      {
+        displayName: 'Atom Sort By',
+        name: 'atomSortBy',
+        type: 'options',
+        options: [
+          { name: 'Created At', value: 'created_at' },
+          { name: 'Block Number', value: 'block_number' },
+        ],
+        default: 'created_at',
+        displayOptions: { show: { resource: ['atoms'], useAtomSort: [true] } },
+      },
+      {
+        displayName: 'Atom Sort Direction',
+        name: 'atomSortDir',
+        type: 'options',
+        options: [
+          { name: 'Descending', value: 'desc' },
+          { name: 'Ascending', value: 'asc' },
+        ],
+        default: 'asc',
+        displayOptions: { show: { resource: ['atoms'], useAtomSort: [true] } },
       },
       {
         displayName: 'Start From Now',
@@ -84,19 +176,127 @@ export class IntuitionTrigger implements INodeType {
         default: 50,
         description: 'Max items to check per poll',
       },
-      // TRIPLE FILTERS
+      // TRIPLE FILTERS (Light)
       {
-        displayName: 'Triple Filters',
-        name: 'tripleFilters',
+        displayName: 'Triple Filters (Light)',
+        name: 'tripleFiltersLight',
         type: 'collection',
         placeholder: 'Add a filter',
         default: {},
-        displayOptions: { show: { resource: ['triples'] } },
+        displayOptions: { show: { resource: ['triples'], lightOutput: [true] } },
         options: [
           { displayName: 'Triple Term ID', name: 'tripleId', type: 'string', default: '' },
-          { displayName: 'Atom Term ID', name: 'atomTermId', type: 'string', default: '' },
-          { displayName: 'Atom Label (contains)', name: 'atomLabel', type: 'string', default: '' },
+          { displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+          { displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
+          { displayName: 'Atom Term ID (any position)', name: 'atomTermId', type: 'string', default: '' },
+          { displayName: 'Atom Label (contains, any position)', name: 'atomLabel', type: 'string', default: '' },
+          { displayName: 'Subject Term ID', name: 'subjectTermId', type: 'string', default: '' },
+          { displayName: 'Predicate Term ID', name: 'predicateTermId', type: 'string', default: '' },
+          { displayName: 'Object Term ID', name: 'objectTermId', type: 'string', default: '' },
+          { displayName: 'Subject Label (contains)', name: 'subjectLabel', type: 'string', default: '' },
+          { displayName: 'Predicate Label (contains)', name: 'predicateLabel', type: 'string', default: '' },
+          { displayName: 'Object Label (contains)', name: 'objectLabel', type: 'string', default: '' },
         ],
+      },
+      // TRIPLE FILTERS (Full)
+      {
+        displayName: 'Triple Filters (Full)',
+        name: 'tripleFiltersFull',
+        type: 'collection',
+        placeholder: 'Add a filter',
+        default: {},
+        displayOptions: { show: { resource: ['triples'], lightOutput: [false] } },
+        options: [
+          { displayName: 'Triple Term ID', name: 'tripleId', type: 'string', default: '' },
+          { displayName: 'Transaction Hash', name: 'transactionHash', type: 'string', default: '' },
+          { displayName: 'Creator ID', name: 'creatorId', type: 'string', default: '' },
+          { displayName: 'Block Number Min', name: 'blockNumberMin', type: 'number', default: 0 },
+          { displayName: 'Block Number Max', name: 'blockNumberMax', type: 'number', default: 0 },
+          { displayName: 'Created At From', name: 'createdAtFrom', type: 'dateTime', default: '' },
+          { displayName: 'Created At To', name: 'createdAtTo', type: 'dateTime', default: '' },
+          { displayName: 'Atom Term ID (any position)', name: 'atomTermId', type: 'string', default: '' },
+          { displayName: 'Atom Label (contains, any position)', name: 'atomLabel', type: 'string', default: '' },
+          { displayName: 'Subject Term ID', name: 'subjectTermId', type: 'string', default: '' },
+          { displayName: 'Predicate Term ID', name: 'predicateTermId', type: 'string', default: '' },
+          { displayName: 'Object Term ID', name: 'objectTermId', type: 'string', default: '' },
+          { displayName: 'Subject Label (contains)', name: 'subjectLabel', type: 'string', default: '' },
+          { displayName: 'Predicate Label (contains)', name: 'predicateLabel', type: 'string', default: '' },
+          { displayName: 'Object Label (contains)', name: 'objectLabel', type: 'string', default: '' },
+          { displayName: 'Subject Type', name: 'subjectType', type: 'string', default: '' },
+          { displayName: 'Predicate Type', name: 'predicateType', type: 'string', default: '' },
+          { displayName: 'Object Type', name: 'objectType', type: 'string', default: '' },
+          { displayName: 'Subject Emoji', name: 'subjectEmoji', type: 'string', default: '' },
+          { displayName: 'Predicate Emoji', name: 'predicateEmoji', type: 'string', default: '' },
+          { displayName: 'Object Emoji', name: 'objectEmoji', type: 'string', default: '' },
+          { displayName: 'Subject Creator ID', name: 'subjectCreatorId', type: 'string', default: '' },
+          { displayName: 'Predicate Creator ID', name: 'predicateCreatorId', type: 'string', default: '' },
+          { displayName: 'Object Creator ID', name: 'objectCreatorId', type: 'string', default: '' },
+          { displayName: 'Subject Data (contains)', name: 'subjectDataContains', type: 'string', default: '' },
+          { displayName: 'Predicate Data (contains)', name: 'predicateDataContains', type: 'string', default: '' },
+          { displayName: 'Object Data (contains)', name: 'objectDataContains', type: 'string', default: '' },
+          { displayName: 'Subject Image (contains)', name: 'subjectImageContains', type: 'string', default: '' },
+          { displayName: 'Predicate Image (contains)', name: 'predicateImageContains', type: 'string', default: '' },
+          { displayName: 'Object Image (contains)', name: 'objectImageContains', type: 'string', default: '' },
+        ],
+      },
+      // Triple relative time + sorting
+      {
+        displayName: 'Use Triple Relative Time Filter',
+        name: 'useTripleRelativeTime',
+        type: 'boolean',
+        default: false,
+        displayOptions: { show: { resource: ['triples'] } },
+        description: 'Filter triples created in the last X time units',
+      },
+      {
+        displayName: 'Relative Amount',
+        name: 'tripleRelativeAmount',
+        type: 'number',
+        default: 60,
+        displayOptions: { show: { resource: ['triples'], useTripleRelativeTime: [true] } },
+      },
+      {
+        displayName: 'Relative Unit',
+        name: 'tripleRelativeUnit',
+        type: 'options',
+        options: [
+          { name: 'Seconds', value: 'seconds' },
+          { name: 'Minutes', value: 'minutes' },
+          { name: 'Hours', value: 'hours' },
+          { name: 'Days', value: 'days' },
+        ],
+        default: 'minutes',
+        displayOptions: { show: { resource: ['triples'], useTripleRelativeTime: [true] } },
+      },
+      {
+        displayName: 'Use Triple Sorting',
+        name: 'useTripleSort',
+        type: 'boolean',
+        default: false,
+        displayOptions: { show: { resource: ['triples'] } },
+        description: 'Apply sorting to triple results',
+      },
+      {
+        displayName: 'Triple Sort By',
+        name: 'tripleSortBy',
+        type: 'options',
+        options: [
+          { name: 'Created At', value: 'created_at' },
+          { name: 'Block Number', value: 'block_number' },
+        ],
+        default: 'created_at',
+        displayOptions: { show: { resource: ['triples'], useTripleSort: [true] } },
+      },
+      {
+        displayName: 'Triple Sort Direction',
+        name: 'tripleSortDir',
+        type: 'options',
+        options: [
+          { name: 'Descending', value: 'desc' },
+          { name: 'Ascending', value: 'asc' },
+        ],
+        default: 'desc',
+        displayOptions: { show: { resource: ['triples'], useTripleSort: [true] } },
       },
       {
         displayName: 'Max Seen Triples',
@@ -113,119 +313,24 @@ export class IntuitionTrigger implements INodeType {
   async poll(this: IPollFunctions): Promise<INodeExecutionData[][] | null> {
     const endpoint = this.getNodeParameter('endpoint') as 'baseSepolia';
     const resource = this.getNodeParameter('resource') as 'atoms' | 'triples';
-    const pageSize = (this.getNodeParameter('pageSize', 50) as number) ?? 50;
-
     const module = BaseSepolia;
     const endpoints = module.ENDPOINTS as Record<string, { url: string }>;
     const client = new GraphQLClient(endpoints[endpoint].url);
 
-    const items: INodeExecutionData[] = [];
-    const data = this.getWorkflowStaticData('node') as IDataObject;
-
     const light = (this.getNodeParameter('lightOutput', false) as boolean) ?? false;
 
     if (resource === 'atoms') {
-      const filters = (this.getNodeParameter(light ? 'atomFiltersLight' : 'atomFiltersFull', {}) as IDataObject) || {};
-      const startFromNow = (this.getNodeParameter('startFromNow', true) as boolean) ?? true;
-      const lastCursor = (data.lastAtomCreatedAt as string) || '';
-
-      if (!lastCursor && startFromNow) {
-        data.lastAtomCreatedAt = new Date().toISOString();
-        return null; // initialize cursor without emitting historical data
-      }
-
-      if (lastCursor) {
-        filters.createdAtFrom = lastCursor;
-      }
-
-      const result = (await module.searchAtoms(
-        client,
-        {
-          termId: (filters.termId as string) || undefined,
-          label: (filters.label as string) || undefined,
-          type: (filters.type as string) || undefined,
-          walletId: (filters.walletId as string) || undefined,
-          transactionHash: (filters.transactionHash as string) || undefined,
-          emoji: (filters.emoji as string) || undefined,
-          imageContains: (filters.imageContains as string) || undefined,
-          createdAtFrom: (filters.createdAtFrom as string) || undefined,
-        },
-        pageSize,
-        0,
-        'created_at',
-        'asc',
-        light ? 'light' : 'full',
-      )) as IDataObject;
-
-      const atoms = ((result as any).atoms || []) as Array<IDataObject & { created_at?: string }>;
-      for (const atom of atoms) {
-        items.push({ json: atom });
-      }
-
-      if (atoms.length > 0) {
-        // advance cursor to the latest created_at
-        const latest = atoms[atoms.length - 1].created_at;
-        if (latest) data.lastAtomCreatedAt = latest;
-      }
-    } else if (resource === 'triples') {
-      const filters = (this.getNodeParameter(light ? 'tripleFiltersLight' : 'tripleFiltersFull', {}) as IDataObject) || {};
-      const startFromNow = (this.getNodeParameter('startFromNow', true) as boolean) ?? true;
-      const maxSeen = (this.getNodeParameter('maxSeen', 10000) as number) ?? 10000;
-
-      // simple persistent deduplication by term_id
-      const seen = (data.seenTripleIds as Record<string, number>) || {};
-      const inited = !!data.seenTriplesInitialized;
-
-      const result = (await module.searchTriples(
-        client,
-        {
-          tripleId: (filters.tripleId as string) || undefined,
-          atomTermId: (filters.atomTermId as string) || undefined,
-          atomLabel: (filters.atomLabel as string) || undefined,
-        },
-        pageSize,
-        0,
-        undefined,
-        undefined,
-        light ? 'light' : 'full',
-      )) as IDataObject;
-
-      const triples = ((result as any).triples || []) as Array<IDataObject & { term_id?: string }>;
-
-      if (!inited && startFromNow) {
-        // seed seen set with current snapshot, do not emit
-        for (const t of triples) {
-          const id = String(t.term_id || '');
-          if (id) seen[id] = Date.now();
-        }
-        data.seenTripleIds = seen;
-        data.seenTriplesInitialized = true;
-        return null;
-      }
-
-      // emit only new unseen triples
-      for (const t of triples) {
-        const id = String(t.term_id || '');
-        if (!id) continue;
-        if (!seen[id]) {
-          seen[id] = Date.now();
-          items.push({ json: t });
-        }
-      }
-
-      // trim seen map if needed
-      const keys = Object.keys(seen);
-      if (keys.length > maxSeen) {
-        // drop oldest entries
-        const sorted = keys.sort((a, b) => seen[a] - seen[b]);
-        const toDrop = sorted.slice(0, keys.length - maxSeen);
-        for (const k of toDrop) delete seen[k];
-      }
-      data.seenTripleIds = seen;
-      data.seenTriplesInitialized = true;
+      const res = await handleAtomsPoll(this, client, light);
+      if (!res) return null;
+      return [res];
     }
 
-    if (items.length === 0) return null;
-    return [items];
+    if (resource === 'triples') {
+      const res = await handleTriplesPoll(this, client, light);
+      if (!res) return null;
+      return [res];
+    }
+
+    return null;
   }
 }
