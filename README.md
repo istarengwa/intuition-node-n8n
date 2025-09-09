@@ -197,12 +197,11 @@ Note: The GraphQL schema has been updated in v1.5. Fields like `id` have been re
 
 ## ⚙️ Dependencies
 
-* [Node.js](https://nodejs.org) 18+
-* [pnpm](https://pnpm.io) (v9+ recommended)
+* [Node.js](https://nodejs.org) 20+
 * [n8n](https://n8n.io) installed globally:
 
 ```bash
-pnpm add -g n8n
+npm i n8n
 ```
 
 ---
