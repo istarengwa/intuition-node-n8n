@@ -68,6 +68,7 @@ Operations (Fetch first, then Search):
       AccountsSepolia.ts         ← Account queries + flexible search
       PositionsSepolia.ts        ← Position queries + flexible search
       VaultsSepolia.ts           ← Vault queries + flexible search
+```
 
 ### 🔔 `Intuition Trigger`
 
@@ -183,7 +184,6 @@ Tip: To detect new triples involving a specific atom label (e.g., “The Hacking
   - Cron → Fetch → Search Positions
   - Relative Time: 24 hours
   - Aggregate in a Function node; export to CSV/Notion/Google Sheets
-```
 
 ---
 
