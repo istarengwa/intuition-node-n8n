@@ -390,6 +390,13 @@ export class IntuitionTrigger implements INodeType {
         description: 'Maximum number of seen triple IDs to remember for deduplication',
         displayOptions: { show: { resource: ['triples'] } },
       },
+      // Footer notice
+      {
+        displayName: '💜 Powered by Istarengwa - CEO The Hacking Project',
+        name: 'poweredByIstarengwa',
+        type: 'notice',
+        default: '',
+      },
     ],
   };
 

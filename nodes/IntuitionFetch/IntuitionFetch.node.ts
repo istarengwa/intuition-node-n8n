@@ -569,11 +569,17 @@ import * as Base from './modules/Base';
 					type: 'number',
 					default: 0,
 					description: 'Skip this many items',
-					displayOptions: {
-						show: { operation: ['searchAtoms', 'searchTriples','searchAccounts','searchPositions','searchVaults'] },
+						displayOptions: {
+							show: { operation: ['searchAtoms', 'searchTriples','searchAccounts','searchPositions','searchVaults'] },
+						},
 					},
-				},
-			],
+                {
+                    displayName: '💜 Powered by Istarengwa - CEO The Hacking Project',
+                    name: 'poweredByIstarengwa',
+                    type: 'notice',
+                    default: '',
+                },
+				],
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
