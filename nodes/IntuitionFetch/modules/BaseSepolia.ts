@@ -11,3 +11,6 @@ export const ENDPOINTS: Record<'baseSepolia', IntuitionEndpoint> = {
 // Re-export the testnet-specific operations to keep the original usage pattern
 export * from './TriplesSepolia';
 export * from './AtomsSepolia';
+export * from './AccountsSepolia';
+export * from './PositionsSepolia';
+export * from './VaultsSepolia';

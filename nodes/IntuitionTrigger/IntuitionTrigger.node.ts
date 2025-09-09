@@ -4,6 +4,9 @@ import { GraphQLClient } from 'graphql-request';
 import * as BaseSepolia from '../IntuitionFetch/modules/BaseSepolia';
 import { handleAtomsPoll } from './modules/AtomsTrigger';
 import { handleTriplesPoll } from './modules/TriplesTrigger';
+import { handleAccountsPoll } from './modules/AccountsTrigger';
+import { handlePositionsPoll } from './modules/PositionsTrigger';
+import { handleVaultsPoll } from './modules/VaultsTrigger';
 
 export class IntuitionTrigger implements INodeType {
   description: INodeTypeDescription = {
@@ -24,7 +27,7 @@ export class IntuitionTrigger implements INodeType {
         name: 'endpoint',
         type: 'options',
         options: [
-          { name: 'Intuition Testnet (Base Sepolia)', value: 'baseSepolia' },
+          { name: 'Intuition Testnet', value: 'baseSepolia' },
         ],
         default: 'baseSepolia',
         description: 'API endpoint (testnet only)',
@@ -43,6 +46,9 @@ export class IntuitionTrigger implements INodeType {
         options: [
           { name: 'Atoms', value: 'atoms' },
           { name: 'Triples', value: 'triples' },
+          { name: 'Accounts', value: 'accounts' },
+          { name: 'Positions', value: 'positions' },
+          { name: 'Vaults', value: 'vaults' },
         ],
         default: 'atoms',
         description: 'Which resource to poll for new items',
@@ -109,7 +115,7 @@ export class IntuitionTrigger implements INodeType {
         type: 'boolean',
         default: false,
         displayOptions: { show: { resource: ['atoms'] } },
-        description: 'Filter atoms created in the last X time units',
+        description: 'Filter atoms created in the last X time units (uses created_at).',
       },
       {
         displayName: 'Relative Amount',
@@ -160,6 +166,83 @@ export class IntuitionTrigger implements INodeType {
         ],
         default: 'asc',
         displayOptions: { show: { resource: ['atoms'], useAtomSort: [true] } },
+      },
+      // ACCOUNTS
+      {
+        displayName: 'Account Filters (Light)',
+        name: 'accountFiltersLight',
+        type: 'collection',
+        placeholder: 'Add a filter',
+        default: {},
+        displayOptions: { show: { resource: ['accounts'], lightOutput: [true] } },
+        options: [
+          { displayName: 'ID', name: 'id', type: 'string', default: '' },
+          { displayName: 'Label (contains)', name: 'label', type: 'string', default: '' },
+          { displayName: 'Type', name: 'type', type: 'string', default: '' },
+          { displayName: 'Atom ID', name: 'atomId', type: 'string', default: '' },
+          { displayName: 'Image (contains)', name: 'imageContains', type: 'string', default: '' },
+        ],
+      },
+      {
+        displayName: 'Account Filters (Full)',
+        name: 'accountFiltersFull',
+        type: 'collection',
+        placeholder: 'Add a filter',
+        default: {},
+        displayOptions: { show: { resource: ['accounts'], lightOutput: [false] } },
+        options: [
+          { displayName: 'ID', name: 'id', type: 'string', default: '' },
+          { displayName: 'Label (contains)', name: 'label', type: 'string', default: '' },
+          { displayName: 'Type', name: 'type', type: 'string', default: '' },
+          { displayName: 'Atom ID', name: 'atomId', type: 'string', default: '' },
+          { displayName: 'Image (contains)', name: 'imageContains', type: 'string', default: '' },
+        ],
+      },
+      {
+        displayName: 'Use Account Relative Time Filter',
+        name: 'useAccountRelativeTime',
+        type: 'boolean',
+        default: false,
+        displayOptions: { show: { resource: ['accounts'] } },
+        description: 'Filter accounts with activity in the last X time units (uses positions.created_at).',
+      },
+      {
+        displayName: 'Relative Amount',
+        name: 'accountRelativeAmount',
+        type: 'number',
+        default: 60,
+        displayOptions: { show: { resource: ['accounts'], useAccountRelativeTime: [true] } },
+      },
+      {
+        displayName: 'Relative Unit',
+        name: 'accountRelativeUnit',
+        type: 'options',
+        options: [ { name: 'Seconds', value: 'seconds' }, { name: 'Minutes', value: 'minutes' }, { name: 'Hours', value: 'hours' }, { name: 'Days', value: 'days' } ],
+        default: 'minutes',
+        displayOptions: { show: { resource: ['accounts'], useAccountRelativeTime: [true] } },
+      },
+      {
+        displayName: 'Use Account Sorting',
+        name: 'useAccountSort',
+        type: 'boolean',
+        default: false,
+        displayOptions: { show: { resource: ['accounts'] } },
+      },
+      {
+        displayName: 'Account Sort By',
+        name: 'accountSortBy',
+        type: 'options',
+        options: [ { name: 'ID', value: 'id' }, { name: 'Label', value: 'label' } ],
+        default: 'label',
+        displayOptions: { show: { resource: ['accounts'], useAccountSort: [true] } },
+      },
+      {
+        displayName: 'Account Sort Direction',
+        name: 'accountSortDir',
+        type: 'options',
+        options: [ { name: 'Ascending', value: 'asc' }, { name: 'Descending', value: 'desc' } ],
+        default: 'asc',
+        displayOptions: { show: { resource: ['accounts'], useAccountSort: [true] } },
       },
       {
         displayName: 'Start From Now',
@@ -246,7 +329,7 @@ export class IntuitionTrigger implements INodeType {
         type: 'boolean',
         default: false,
         displayOptions: { show: { resource: ['triples'] } },
-        description: 'Filter triples created in the last X time units',
+        description: 'Filter triples created in the last X time units (uses created_at).',
       },
       {
         displayName: 'Relative Amount',
@@ -330,7 +413,21 @@ export class IntuitionTrigger implements INodeType {
       if (!res) return null;
       return [res];
     }
-
+    if (resource === 'accounts') {
+      const res = await handleAccountsPoll(this, client, light);
+      if (!res) return null;
+      return [res];
+    }
+    if (resource === 'positions') {
+      const res = await handlePositionsPoll(this, client, light);
+      if (!res) return null;
+      return [res];
+    }
+    if (resource === 'vaults') {
+      const res = await handleVaultsPoll(this, client, light);
+      if (!res) return null;
+      return [res];
+    }
     return null;
   }
 }

@@ -41,7 +41,7 @@ pnpm dev
 
 This node allows you to interact with the Intuition GraphQL API on the public testnet (testnet-only for now):
 
-- Intuition Testnet (Base Sepolia Indexer): `https://testnet.intuition.sh/v1/graphql`
+- Intuition Testnet indexer: `https://testnet.intuition.sh/v1/graphql`
 
 | Operation                  | Description                                                                       |
 | -------------------------- | --------------------------------------------------------------------------------- |
